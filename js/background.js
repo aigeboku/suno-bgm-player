@@ -95,18 +95,14 @@ async function fetchArtistSongs(handle) {
       }
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
     const html = await response.text();
 
     // Extract artist profile info
     const artistData = extractArtistProfile(html, handle);
     state.artistData = artistData;
 
-    // Extract songs from the SSR data
-    const songs = extractArtistSongs(html);
+    // Extract songs from the RSC flight data
+    const songs = parseSongsFromPage(html);
 
     if (songs.length > 0) {
       state.playlist = songs;
@@ -122,14 +118,6 @@ async function fetchArtistSongs(handle) {
       console.log(`Loaded ${songs.length} songs from @${handle}`);
     } else {
       console.warn(`No songs found for @${handle}`);
-      // Try fallback: extract from song links
-      const fallbackSongs = parseSongsFromPage(html);
-      if (fallbackSongs.length > 0) {
-        state.playlist = fallbackSongs;
-        generateShuffledIndices();
-        state.currentIndex = -1;
-        state.currentSong = null;
-      }
     }
   } catch (e) {
     console.error(`Failed to fetch artist @${handle}:`, e);
@@ -160,96 +148,40 @@ function extractArtistProfile(html, handle) {
   return { handle, displayName, avatarUrl };
 }
 
-function extractArtistSongs(html) {
-  const songs = [];
-  const seenIds = new Set();
-
-  // Unescape the HTML (Next.js RSC format uses \" escaping)
-  const unescaped = html.replace(/\\"/g, '"');
-
-  // Find the clips array in the SSR data
-  // Structure: "clips":[{...},{...},...], "playlists":
-  const clipsStart = unescaped.indexOf('"clips":[');
-  if (clipsStart === -1) {
-    console.warn('No clips array found in artist page');
-    return songs;
-  }
-
-  // Find the matching closing bracket
-  const arrayStart = clipsStart + '"clips":'.length;
-  let depth = 0;
-  let arrayEnd = arrayStart;
-  for (let i = arrayStart; i < Math.min(arrayStart + 200000, unescaped.length); i++) {
-    if (unescaped[i] === '[') depth++;
-    else if (unescaped[i] === ']') {
-      depth--;
-      if (depth === 0) {
-        arrayEnd = i + 1;
-        break;
-      }
-    }
-  }
-
-  const clipsStr = unescaped.substring(arrayStart, arrayEnd);
-
-  // Extract individual song objects
-  // Pattern: "title":"..." ... "id":"uuid" within each clip object
-  const clipPattern = /"status":"complete","title":"([^"]*)"[^}]*?"id":"([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})"/g;
-  let match;
-  while ((match = clipPattern.exec(clipsStr)) !== null) {
-    const title = match[1];
-    const id = match[2];
-    if (id !== '00000000-0000-0000-0000-000000000000' && !seenIds.has(id)) {
-      seenIds.add(id);
-      songs.push({
-        id: id,
-        title: decodeHTMLEntities(title),
-        artist: '',
-        audioUrl: `https://cdn1.suno.ai/${id}.mp3`,
-        imageUrl: `https://cdn2.suno.ai/image_large_${id}.jpeg`
-      });
-    }
-  }
-
-  return songs;
-}
-
-// --- Shared parsing utilities ---
+// --- Unified song parser for RSC flight data ---
 function parseSongsFromPage(html) {
   const songs = [];
   const seenIds = new Set();
+  const unescaped = html.replace(/\\"/g, '"');
 
-  const songIdRegex = /\/song\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/g;
-  let match;
-  while ((match = songIdRegex.exec(html)) !== null) {
-    const id = match[1];
-    if (!seenIds.has(id)) {
+  // Split by clip status marker - each complete clip starts with "status":"complete"
+  const parts = unescaped.split('"status":"complete"');
+
+  for (let i = 1; i < parts.length; i++) {
+    const part = parts[i];
+
+    // Verify this is a song/clip object
+    if (!part.includes('"entity_type":"song_schema"')) continue;
+
+    const titleMatch = part.match(/^,"title":"([^"]*)"/);
+    const idMatch = part.match(/"id":"([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})"/);
+    const audioMatch = part.match(/"audio_url":"([^"]*)"/);
+    const imageLargeMatch = part.match(/"image_large_url":"([^"]*)"/);
+    const imageMatch = part.match(/"image_url":"([^"]*)"/);
+    const displayNameMatch = part.match(/"display_name":"([^"]*)"/);
+
+    if (idMatch && idMatch[1] !== '00000000-0000-0000-0000-000000000000' && !seenIds.has(idMatch[1])) {
+      const id = idMatch[1];
       seenIds.add(id);
       songs.push({
         id: id,
-        title: '',
-        artist: '',
-        audioUrl: `https://cdn1.suno.ai/${id}.mp3`,
-        imageUrl: `https://cdn2.suno.ai/image_large_${id}.jpeg`
+        title: titleMatch ? decodeHTMLEntities(titleMatch[1]) : 'Suno Track',
+        artist: displayNameMatch ? decodeHTMLEntities(displayNameMatch[1]) : '',
+        audioUrl: audioMatch ? audioMatch[1] : `https://cdn1.suno.ai/${id}.mp3`,
+        imageUrl: imageLargeMatch ? imageLargeMatch[1] : (imageMatch ? imageMatch[1] : '')
       });
     }
   }
-
-  // Try to extract titles
-  const unescaped = html.replace(/\\"/g, '"');
-  const titleRegex = /"title":"([^"]+)"[^}]*?"id":"([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})"/g;
-  while ((match = titleRegex.exec(unescaped)) !== null) {
-    const song = songs.find(s => s.id === match[2]);
-    if (song && !song.title) {
-      song.title = decodeHTMLEntities(match[1]);
-    }
-  }
-
-  songs.forEach((song, i) => {
-    if (!song.title) {
-      song.title = `Suno Track #${i + 1}`;
-    }
-  });
 
   return songs;
 }

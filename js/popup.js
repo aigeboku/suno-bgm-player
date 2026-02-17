@@ -130,7 +130,9 @@ function updateUI(state) {
         artistAvatar.src = state.artistData.avatarUrl;
         artistAvatar.style.display = 'block';
       }
-      artistInput.value = state.artistData.handle;
+      if (document.activeElement !== artistInput) {
+        artistInput.value = state.artistData.handle;
+      }
     }
   } else {
     if (currentSource === 'trending') {
