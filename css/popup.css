@@ -353,6 +353,45 @@ body {
   min-width: 0;
 }
 
+.song-info-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.song-info-text {
+  flex: 1;
+  min-width: 0;
+}
+
+/* === Favorite Button (Now Playing) === */
+.btn-favorite {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-favorite:hover {
+  color: var(--accent-red);
+  transform: scale(1.15);
+}
+
+.btn-favorite.active {
+  color: var(--accent-red);
+}
+
+.btn-favorite.active:hover {
+  opacity: 0.7;
+}
+
 .song-title {
   font-size: 14px;
   font-weight: 600;
@@ -695,6 +734,116 @@ body {
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
+}
+
+/* === Favorites Section === */
+.favorites-section {
+  max-height: 200px;
+  overflow-y: auto;
+  border-radius: var(--radius-md);
+  background: rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
+
+.favorites-section.hidden {
+  display: none;
+}
+
+.favorites-section::-webkit-scrollbar {
+  width: 4px;
+}
+
+.favorites-section::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.favorites-section::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.favorites-list {
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+}
+
+.favorites-empty {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.favorites-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+}
+
+.favorites-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--glass-border);
+}
+
+.favorites-item.active {
+  background: rgba(245, 158, 11, 0.06);
+  border-color: rgba(245, 158, 11, 0.12);
+}
+
+.favorites-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.favorites-item-title {
+  font-size: 13px;
+  color: #bbb;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.favorites-item.active .favorites-item-title {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.favorites-item-artist {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.favorites-item-remove {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+}
+
+.favorites-item:hover .favorites-item-remove {
+  opacity: 1;
+}
+
+.favorites-item-remove:hover {
+  color: var(--accent-red);
 }
 
 /* === Subtle ambient light animation === */

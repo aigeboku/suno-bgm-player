@@ -39,6 +39,12 @@
           </svg>
           <span>アーティスト</span>
         </button>
+        <button id="tab-favorites" class="source-tab" title="お気に入り">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+          <span>お気に入り</span>
+        </button>
       </div>
 
       <!-- Artist Search (hidden by default) -->
@@ -64,6 +70,11 @@
           </div>
         </div>
       </div>
+
+      <!-- Favorites List (hidden by default) -->
+      <div id="favorites-section" class="favorites-section hidden">
+        <div id="favorites-list" class="favorites-list"></div>
+      </div>
     </div>
 
     <!-- Now Playing -->
@@ -77,8 +88,20 @@
         </div>
       </div>
       <div class="song-info">
-        <div id="song-title" class="song-title">曲を選択してください</div>
-        <div id="song-artist" class="song-artist">Suno BGM Player</div>
+        <div class="song-info-row">
+          <div class="song-info-text">
+            <div id="song-title" class="song-title">曲を選択してください</div>
+            <div id="song-artist" class="song-artist">Suno BGM Player</div>
+          </div>
+          <button id="btn-favorite" class="btn-favorite" title="お気に入りに追加">
+            <svg id="icon-heart-outline" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            <svg id="icon-heart-filled" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="display:none">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
 

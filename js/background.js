@@ -13,8 +13,9 @@ let state = {
   loading: false,
   loadingMessage: '',
   shuffledIndices: [],
-  source: 'trending', // 'trending' or 'artist'
-  artistData: null     // { handle, displayName, avatarUrl }
+  source: 'trending', // 'trending', 'artist', or 'favorites'
+  artistData: null,    // { handle, displayName, avatarUrl }
+  favorites: []        // [{ id, title, artist, audioUrl, imageUrl }]
 };
 
 // ===== Offscreen Document Management =====
@@ -371,7 +372,13 @@ function getStateSnapshot() {
     loadingMessage: state.loadingMessage,
     playlistLength: state.playlist.length,
     source: state.source,
-    artistData: state.artistData
+    artistData: state.artistData,
+    favorites: state.favorites.map(s => ({
+      id: s.id,
+      title: s.title,
+      artist: s.artist,
+      imageUrl: s.imageUrl
+    }))
   };
 }
 
@@ -425,9 +432,57 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     case 'switchSource':
       if (message.source === 'trending') {
         fetchTrendingPlaylist();
+      } else if (message.source === 'favorites') {
+        state.source = 'favorites';
+        state.artistData = null;
+        state.playlist = [...state.favorites];
+        generateShuffledIndices();
+        state.currentIndex = -1;
+        state.currentSong = null;
+        chrome.storage.local.set({ source: 'favorites' });
+        broadcastState();
       }
       sendResponse({ ok: true });
       break;
+
+    case 'addFavorite': {
+      const songId = message.songId;
+      if (songId && !state.favorites.some(f => f.id === songId)) {
+        // Look up full song data from current playlist or currentSong
+        const fullSong = state.playlist.find(s => s.id === songId) ||
+                         (state.currentSong?.id === songId ? state.currentSong : null);
+        if (fullSong) {
+          state.favorites.push({
+            id: fullSong.id,
+            title: fullSong.title,
+            artist: fullSong.artist || (state.artistData ? state.artistData.displayName : ''),
+            audioUrl: fullSong.audioUrl || `https://cdn1.suno.ai/${fullSong.id}.mp3`,
+            imageUrl: fullSong.imageUrl
+          });
+          chrome.storage.local.set({ favorites: state.favorites });
+          if (state.source === 'favorites') {
+            state.playlist = [...state.favorites];
+            generateShuffledIndices();
+          }
+        }
+      }
+      broadcastState();
+      sendResponse({ ok: true });
+      break;
+    }
+
+    case 'removeFavorite': {
+      const removeId = message.id;
+      state.favorites = state.favorites.filter(f => f.id !== removeId);
+      chrome.storage.local.set({ favorites: state.favorites });
+      if (state.source === 'favorites') {
+        state.playlist = [...state.favorites];
+        generateShuffledIndices();
+      }
+      broadcastState();
+      sendResponse({ ok: true });
+      break;
+    }
 
     case 'playSongAtIndex':
       const directIndex = message.index;
@@ -480,13 +535,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // ===== Initialization =====
 async function init() {
-  const saved = await chrome.storage.local.get(['volume', 'shuffle', 'repeat', 'source', 'lastArtistHandle']);
+  const saved = await chrome.storage.local.get(['volume', 'shuffle', 'repeat', 'source', 'lastArtistHandle', 'favorites']);
   if (saved.volume !== undefined) state.volume = saved.volume;
   if (saved.shuffle !== undefined) state.shuffle = saved.shuffle;
   if (saved.repeat !== undefined) state.repeat = saved.repeat;
+  if (saved.favorites?.length > 0) state.favorites = saved.favorites;
 
   // Restore last source
-  if (saved.source === 'artist' && saved.lastArtistHandle) {
+  if (saved.source === 'favorites') {
+    state.source = 'favorites';
+    state.playlist = [...state.favorites];
+    generateShuffledIndices();
+    broadcastState();
+  } else if (saved.source === 'artist' && saved.lastArtistHandle) {
     await fetchArtistSongs(saved.lastArtistHandle);
   } else {
     await fetchTrendingPlaylist();

@@ -29,6 +29,7 @@ const loadingText = document.getElementById('loading-text');
 // Source tabs
 const tabTrending = document.getElementById('tab-trending');
 const tabArtist = document.getElementById('tab-artist');
+const tabFavorites = document.getElementById('tab-favorites');
 const artistSearch = document.getElementById('artist-search');
 const artistInput = document.getElementById('artist-input');
 const btnLoadArtist = document.getElementById('btn-load-artist');
@@ -36,11 +37,18 @@ const artistInfo = document.getElementById('artist-info');
 const artistAvatar = document.getElementById('artist-avatar');
 const artistName = document.getElementById('artist-name');
 const artistHandle = document.getElementById('artist-handle');
+const favoritesSection = document.getElementById('favorites-section');
+const favoritesList = document.getElementById('favorites-list');
+
+// Favorite button
+const btnFavorite = document.getElementById('btn-favorite');
+const iconHeartOutline = document.getElementById('icon-heart-outline');
+const iconHeartFilled = document.getElementById('icon-heart-filled');
 
 // === State ===
 let currentState = null;
 let playlistVisible = false;
-let currentSource = 'trending'; // 'trending' or 'artist'
+let currentSource = 'trending'; // 'trending', 'artist', or 'favorites'
 
 // === Helpers ===
 function formatTime(seconds) {
@@ -51,12 +59,18 @@ function formatTime(seconds) {
 }
 
 // === Source Tab Switching ===
+function setActiveTab(tab) {
+  tabTrending.classList.remove('active');
+  tabArtist.classList.remove('active');
+  tabFavorites.classList.remove('active');
+  tab.classList.add('active');
+  artistSearch.classList.add('hidden');
+  favoritesSection.classList.add('hidden');
+}
+
 tabTrending.addEventListener('click', () => {
   currentSource = 'trending';
-  tabTrending.classList.add('active');
-  tabArtist.classList.remove('active');
-  artistSearch.classList.add('hidden');
-  // Load trending if not already
+  setActiveTab(tabTrending);
   chrome.runtime.sendMessage({ action: 'getState' }, (response) => {
     if (response && response.source !== 'trending') {
       chrome.runtime.sendMessage({ action: 'switchSource', source: 'trending' });
@@ -66,10 +80,23 @@ tabTrending.addEventListener('click', () => {
 
 tabArtist.addEventListener('click', () => {
   currentSource = 'artist';
-  tabArtist.classList.add('active');
-  tabTrending.classList.remove('active');
+  setActiveTab(tabArtist);
   artistSearch.classList.remove('hidden');
   artistInput.focus();
+});
+
+tabFavorites.addEventListener('click', () => {
+  currentSource = 'favorites';
+  setActiveTab(tabFavorites);
+  favoritesSection.classList.remove('hidden');
+  chrome.runtime.sendMessage({ action: 'getState' }, (response) => {
+    if (response) {
+      renderFavorites(response);
+      if (response.source !== 'favorites') {
+        chrome.runtime.sendMessage({ action: 'switchSource', source: 'favorites' });
+      }
+    }
+  });
 });
 
 // === Artist Search ===
@@ -117,8 +144,7 @@ function updateUI(state) {
   // Update source tabs
   if (state.source === 'artist') {
     currentSource = 'artist';
-    tabArtist.classList.add('active');
-    tabTrending.classList.remove('active');
+    setActiveTab(tabArtist);
     artistSearch.classList.remove('hidden');
 
     // Show artist info
@@ -134,12 +160,33 @@ function updateUI(state) {
         artistInput.value = state.artistData.handle;
       }
     }
+  } else if (state.source === 'favorites') {
+    currentSource = 'favorites';
+    setActiveTab(tabFavorites);
+    favoritesSection.classList.remove('hidden');
+    renderFavorites(state);
   } else {
     if (currentSource === 'trending') {
-      tabTrending.classList.add('active');
-      tabArtist.classList.remove('active');
-      artistSearch.classList.add('hidden');
+      setActiveTab(tabTrending);
     }
+  }
+
+  // Favorite button state
+  if (state.currentSong && state.favorites) {
+    const isFav = state.favorites.some(f => f.id === state.currentSong.id);
+    btnFavorite.classList.toggle('active', isFav);
+    iconHeartOutline.style.display = isFav ? 'none' : 'block';
+    iconHeartFilled.style.display = isFav ? 'block' : 'none';
+    btnFavorite.title = isFav ? 'お気に入りから削除' : 'お気に入りに追加';
+  } else {
+    btnFavorite.classList.remove('active');
+    iconHeartOutline.style.display = 'block';
+    iconHeartFilled.style.display = 'none';
+  }
+
+  // Update favorites list if visible
+  if (currentSource === 'favorites') {
+    renderFavorites(state);
   }
 
   // Re-enable load button
@@ -242,6 +289,66 @@ function renderPlaylist(state) {
     activeItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }
 }
+
+// === Favorites ===
+function renderFavorites(state) {
+  if (!state.favorites || state.favorites.length === 0) {
+    favoritesList.innerHTML = '<div class="favorites-empty">お気に入りに曲を追加してください<br>再生中の曲のハートボタンで追加できます</div>';
+    return;
+  }
+
+  const currentSongId = state.currentSong?.id;
+
+  favoritesList.innerHTML = state.favorites.map((song, index) => {
+    const isActive = song.id === currentSongId && state.source === 'favorites';
+    return `
+      <div class="favorites-item ${isActive ? 'active' : ''}" data-id="${song.id}" data-index="${index}">
+        <div class="favorites-item-info">
+          <div class="favorites-item-title">${song.title || 'Unknown Track'}</div>
+          <div class="favorites-item-artist">${song.artist || 'Suno'}</div>
+        </div>
+        <button class="favorites-item-remove" data-id="${song.id}" title="削除">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+            <path d="M10 11v6M14 11v6"/>
+          </svg>
+        </button>
+      </div>
+    `;
+  }).join('');
+
+  // Click to play
+  favoritesList.querySelectorAll('.favorites-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      if (e.target.closest('.favorites-item-remove')) return;
+      const index = parseInt(item.dataset.index);
+      if (state.source !== 'favorites') {
+        chrome.runtime.sendMessage({ action: 'switchSource', source: 'favorites' });
+      }
+      chrome.runtime.sendMessage({ action: 'playSongAtIndex', index });
+    });
+  });
+
+  // Remove from favorites
+  favoritesList.querySelectorAll('.favorites-item-remove').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      chrome.runtime.sendMessage({ action: 'removeFavorite', id: btn.dataset.id });
+    });
+  });
+}
+
+btnFavorite.addEventListener('click', () => {
+  if (!currentState?.currentSong) return;
+  const song = currentState.currentSong;
+  const isFav = currentState.favorites?.some(f => f.id === song.id);
+  if (isFav) {
+    chrome.runtime.sendMessage({ action: 'removeFavorite', id: song.id });
+  } else {
+    chrome.runtime.sendMessage({ action: 'addFavorite', songId: song.id });
+  }
+});
 
 // === Event Listeners ===
 btnPlay.addEventListener('click', () => {
