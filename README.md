@@ -11,7 +11,8 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Manifest-V3-blue?style=flat-square" alt="Manifest V3">
   <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="MIT License">
-  <img src="https://img.shields.io/badge/Version-2.0.0-orange?style=flat-square" alt="Version 2.0.0">
+  <img src="https://img.shields.io/badge/Version-2.1.0-orange?style=flat-square" alt="Version 2.1.0">
+  <img src="https://img.shields.io/badge/UI-Liquid%20Glass-blueviolet?style=flat-square" alt="Liquid Glass UI">
 </p>
 
 ---
@@ -19,6 +20,8 @@
 ## 概要
 
 **Suno BGM Player** は、AI音楽生成プラットフォーム [Suno](https://suno.com) の楽曲をワンクリックでBGMとして再生できる Chrome 拡張機能です。作業中やリラックスタイムに、Suno のトレンド曲を流したり、お気に入りのアーティストの曲だけを集めて聴くことができます。ポップアップを閉じてもバックグラウンドで再生が継続するため、ブラウジングの邪魔になりません。
+
+UI は macOS の **Liquid Glass** にインスパイアされたダークグラスモーフィズムデザインを採用しており、半透明のすりガラス質感とアンバーのアクセントカラーが特徴です。
 
 ## スクリーンショット
 
@@ -53,7 +56,7 @@
 1. このリポジトリを clone またはダウンロードします
 
    ```bash
-   git clone https://github.com/YOUR_USERNAME/suno-bgm-player.git
+   git clone https://github.com/aigeboku/suno-bgm-player.git
    ```
 
 2. Chrome で `chrome://extensions` を開きます
@@ -116,6 +119,8 @@ suno-bgm-player/
 **Suno BGM Player** は Chrome Manifest V3 の **Offscreen Document API** を活用して、バックグラウンドでのオーディオ再生を実現しています。
 
 Suno のページ（トレンドプレイリストやアーティストプロフィール）から SSR（サーバーサイドレンダリング）データを解析して曲情報（ID、タイトル）を抽出し、Suno の CDN（`cdn1.suno.ai/{id}.mp3`）から直接 MP3 ストリームを再生します。設定は `chrome.storage.local` に永続化されるため、ブラウザを再起動しても前回の状態が復元されます。
+
+UI は CSS の `backdrop-filter: blur()` と半透明レイヤーを組み合わせた **ダークグラスモーフィズム** で構築されています。背景にはパープル/ブルーのアンビエントグラデーション、各要素には微妙な光の反射とアンバーのアクセントグローを配置し、macOS Liquid Glass のような奥行きのある質感を実現しています。
 
 ## 注意事項
 
