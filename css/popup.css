@@ -1,41 +1,116 @@
-/* === Base === */
+/* ============================================================
+   Suno BGM Player — Apple Liquid Glass Design
+   Dual Theme (Light default + Dark via prefers-color-scheme)
+   ============================================================ */
+
+/* === Reset === */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* === CSS Custom Properties — Light Theme (Default) === */
 :root {
-  --glass-bg: rgba(18, 18, 28, 0.65);
-  --glass-bg-light: rgba(255, 255, 255, 0.04);
-  --glass-bg-hover: rgba(255, 255, 255, 0.07);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-border-light: rgba(255, 255, 255, 0.12);
+  --bg-gradient-1: #f8f4f0;
+  --bg-gradient-2: #ece5dc;
+
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-bg-elevated: rgba(255, 255, 255, 0.78);
+  --glass-bg-hover: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-border-subtle: rgba(0, 0, 0, 0.06);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --glass-shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.06);
   --glass-blur: 24px;
+  --glass-saturate: 1.4;
+
   --accent: #f59e0b;
-  --accent-red: #ef4444;
+  --accent-hover: #d97706;
   --accent-glow: rgba(245, 158, 11, 0.25);
-  --text-primary: #f0f0f0;
-  --text-secondary: #999;
-  --text-muted: #666;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
+  --accent-bg: rgba(245, 158, 11, 0.1);
+  --accent-red: #ef4444;
+
+  --text-primary: #1a1a2e;
+  --text-secondary: #666;
+  --text-muted: #999;
+  --text-on-accent: #fff;
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-pill: 100px;
+
+  --specular-start: rgba(255, 255, 255, 0.4);
+  --specular-mid: rgba(255, 255, 255, 0.1);
+
+  --tabs-bg: rgba(0, 0, 0, 0.04);
+  --input-bg: rgba(0, 0, 0, 0.03);
+  --overlay-bg: rgba(255, 255, 255, 0.85);
+  --scrollbar-thumb: rgba(0, 0, 0, 0.12);
+
+  --placeholder-color: rgba(0, 0, 0, 0.3);
+  --progress-track: rgba(0, 0, 0, 0.06);
+  --volume-track: rgba(0, 0, 0, 0.06);
+  --spinner-track: rgba(0, 0, 0, 0.06);
 }
 
+/* === CSS Custom Properties — Dark Theme === */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-gradient-1: #08080f;
+    --bg-gradient-2: #0c0c18;
+
+    --glass-bg: rgba(22, 22, 35, 0.65);
+    --glass-bg-elevated: rgba(30, 30, 48, 0.72);
+    --glass-bg-hover: rgba(40, 40, 60, 0.78);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-border-subtle: rgba(255, 255, 255, 0.05);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    --glass-shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.3);
+
+    --text-primary: #f0f0f5;
+    --text-secondary: #aaa;
+    --text-muted: #666;
+
+    --specular-start: rgba(255, 255, 255, 0.15);
+    --specular-mid: rgba(255, 255, 255, 0.03);
+
+    --tabs-bg: rgba(0, 0, 0, 0.3);
+    --input-bg: rgba(0, 0, 0, 0.25);
+    --overlay-bg: rgba(8, 8, 15, 0.88);
+    --scrollbar-thumb: rgba(255, 255, 255, 0.1);
+
+    --placeholder-color: rgba(255, 255, 255, 0.25);
+    --progress-track: rgba(255, 255, 255, 0.06);
+    --volume-track: rgba(255, 255, 255, 0.06);
+    --spinner-track: rgba(255, 255, 255, 0.06);
+  }
+}
+
+/* === Body Background === */
 body {
   width: 380px;
   min-height: 200px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+    'Helvetica Neue', Arial, sans-serif;
   color: var(--text-primary);
   overflow-x: hidden;
-  /* Dark ambient background with subtle color streaks */
-  background: 
-    radial-gradient(ellipse at 20% 50%, rgba(88, 28, 135, 0.15) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 20%, rgba(30, 64, 175, 0.12) 0%, transparent 50%),
-    radial-gradient(ellipse at 60% 80%, rgba(245, 158, 11, 0.06) 0%, transparent 50%),
-    linear-gradient(160deg, #08080f 0%, #0c0c18 40%, #0a0a14 100%);
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(245, 158, 11, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(147, 130, 220, 0.06) 0%, transparent 50%),
+    linear-gradient(160deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
   background-attachment: fixed;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(88, 28, 135, 0.15) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(30, 64, 175, 0.10) 0%, transparent 50%),
+      radial-gradient(ellipse at 60% 80%, rgba(245, 158, 11, 0.05) 0%, transparent 50%),
+      linear-gradient(160deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
+  }
 }
 
 /* === Player Container (Main Glass Panel) === */
@@ -43,20 +118,39 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 18px;
-  gap: 14px;
+  padding: 20px;
+  gap: 16px;
   background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   border: 1px solid var(--glass-border);
-  /* Subtle light reflection on top edge */
-  border-top-color: rgba(255, 255, 255, 0.12);
-  border-left-color: rgba(255, 255, 255, 0.10);
-  /* Ambient glow shadow */
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.5),
-    0 0 80px rgba(88, 28, 135, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border-bottom-color: var(--glass-border-subtle);
+  box-shadow: var(--glass-shadow);
+  overflow: hidden;
+}
+
+/* Specular highlight reflection */
+.player-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(
+    135deg,
+    var(--specular-start) 0%,
+    var(--specular-mid) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ensure all direct children sit above the specular layer */
+.player-container > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* === Header === */
@@ -73,23 +167,23 @@ body {
 }
 
 .logo {
-  width: 30px;
-  height: 30px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-red));
-  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--accent), #e8853a);
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
   font-weight: bold;
-  color: white;
-  box-shadow: 0 2px 12px rgba(245, 158, 11, 0.3);
+  color: var(--text-on-accent);
+  box-shadow: 0 2px 12px var(--accent-glow);
 }
 
 .app-title {
   font-size: 18px;
-  font-weight: 300;
-  letter-spacing: 0.5px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
   background: linear-gradient(135deg, var(--accent), #e8853a);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -97,48 +191,46 @@ body {
 }
 
 .icon-btn {
-  background: var(--glass-bg-light);
-  border: 1px solid var(--glass-border);
+  background: var(--glass-bg-elevated);
+  border: 1px solid var(--glass-border-subtle);
   color: var(--text-secondary);
   cursor: pointer;
-  padding: 7px;
+  padding: 8px;
   border-radius: var(--radius-sm);
   transition: all 0.25s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .icon-btn:hover {
   color: var(--text-primary);
   background: var(--glass-bg-hover);
-  border-color: var(--glass-border-light);
+  border-color: var(--glass-border);
 }
 
 .icon-btn.spinning svg {
   animation: spin 1s linear infinite;
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* === Source Selector === */
+/* === Source Section === */
 .source-section {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
+/* Source Tabs — Pill Segmented Control */
 .source-tabs {
   display: flex;
   gap: 4px;
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--tabs-bg);
   backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: var(--radius-pill);
   padding: 4px;
 }
 
@@ -150,26 +242,27 @@ body {
   gap: 6px;
   padding: 8px 14px;
   border: 1px solid transparent;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-pill);
   background: transparent;
   color: var(--text-muted);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-family: inherit;
 }
 
 .source-tab:hover {
   color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--glass-bg-elevated);
 }
 
 .source-tab.active {
-  background: rgba(245, 158, 11, 0.1);
-  border-color: rgba(245, 158, 11, 0.2);
-  color: var(--accent);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--text-on-accent);
   font-weight: 600;
-  box-shadow: 0 0 16px rgba(245, 158, 11, 0.08);
+  box-shadow: 0 2px 16px var(--accent-glow);
 }
 
 /* === Artist Search === */
@@ -179,25 +272,22 @@ body {
   gap: 10px;
 }
 
-.artist-search.hidden {
-  display: none;
-}
-
 .search-input-wrapper {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 14px;
-  background: rgba(0, 0, 0, 0.25);
+  padding: 10px 14px;
+  background: var(--input-bg);
   backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: var(--radius-pill);
   transition: all 0.3s ease;
 }
 
 .search-input-wrapper:focus-within {
-  border-color: rgba(245, 158, 11, 0.35);
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.4);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.08);
 }
 
 .search-input-wrapper svg {
@@ -216,7 +306,7 @@ body {
 }
 
 .artist-input::placeholder {
-  color: #4a4a5a;
+  color: var(--placeholder-color);
 }
 
 .btn-load-artist {
@@ -226,13 +316,13 @@ body {
   width: 30px;
   height: 30px;
   border: none;
-  border-radius: var(--radius-sm);
-  background: linear-gradient(135deg, var(--accent), var(--accent-red));
-  color: white;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+  color: var(--text-on-accent);
   cursor: pointer;
   flex-shrink: 0;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.25);
+  box-shadow: 0 2px 10px var(--accent-glow);
 }
 
 .btn-load-artist:hover {
@@ -248,22 +338,20 @@ body {
   opacity: 0.4;
   cursor: not-allowed;
   box-shadow: none;
+  transform: none;
 }
 
-/* Artist Info */
+/* === Artist Info === */
 .artist-info {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 12px;
-  background: rgba(245, 158, 11, 0.04);
+  padding: 10px 14px;
+  background: var(--accent-bg);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: var(--radius-md);
-  border: 1px solid rgba(245, 158, 11, 0.1);
-}
-
-.artist-info.hidden {
-  display: none;
+  border: 1px solid rgba(245, 158, 11, 0.12);
 }
 
 .artist-avatar {
@@ -271,8 +359,8 @@ body {
   height: 36px;
   border-radius: 50%;
   object-fit: cover;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--glass-border);
+  background: var(--input-bg);
+  border: 1px solid var(--glass-border-subtle);
 }
 
 .artist-details {
@@ -298,18 +386,42 @@ body {
 
 /* === Now Playing (Inner Glass Card) === */
 .now-playing {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 14px;
   padding: 14px;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--glass-bg-elevated);
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
-  border-top-color: rgba(255, 255, 255, 0.10);
   border-radius: var(--radius-md);
-  box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  box-shadow: var(--glass-shadow-elevated);
+  overflow: hidden;
+}
+
+/* Specular highlight on the now-playing card */
+.now-playing::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 45%;
+  background: linear-gradient(
+    135deg,
+    var(--specular-start) 0%,
+    var(--specular-mid) 35%,
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+}
+
+.now-playing > * {
+  position: relative;
+  z-index: 1;
 }
 
 .album-art-container {
@@ -317,11 +429,17 @@ body {
   width: 64px;
   height: 64px;
   flex-shrink: 0;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--glass-border);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background: var(--input-bg);
+  border: 1px solid var(--glass-border-subtle);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+  .album-art-container {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
 }
 
 .album-art {
@@ -341,7 +459,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #444;
+  color: var(--text-muted);
 }
 
 .album-art.loaded + .album-placeholder {
@@ -364,7 +482,25 @@ body {
   min-width: 0;
 }
 
-/* === Favorite Button (Now Playing) === */
+.song-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+
+.song-artist {
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* === Favorite Button === */
 .btn-favorite {
   flex-shrink: 0;
   background: none;
@@ -392,25 +528,7 @@ body {
   opacity: 0.7;
 }
 
-.song-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: 4px;
-}
-
-.song-artist {
-  font-size: 12px;
-  color: var(--text-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* === Progress === */
+/* === Progress Section === */
 .progress-section {
   display: flex;
   align-items: center;
@@ -424,6 +542,7 @@ body {
   font-variant-numeric: tabular-nums;
   min-width: 32px;
   text-align: center;
+  font-weight: 500;
 }
 
 .progress-bar-container {
@@ -433,8 +552,8 @@ body {
 .progress-bar {
   width: 100%;
   height: 4px;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 2px;
+  background: var(--progress-track);
+  border-radius: var(--radius-pill);
   cursor: pointer;
   position: relative;
   overflow: hidden;
@@ -447,11 +566,11 @@ body {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--accent-red));
-  border-radius: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+  border-radius: var(--radius-pill);
   width: 0%;
   transition: width 0.3s linear;
-  box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 0 8px var(--accent-glow);
 }
 
 /* === Controls === */
@@ -459,12 +578,12 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .control-btn {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--glass-border);
+  background: var(--glass-bg-elevated);
+  border: 1px solid var(--glass-border-subtle);
   color: var(--text-secondary);
   cursor: pointer;
   padding: 9px;
@@ -474,44 +593,52 @@ body {
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .control-btn:hover {
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.08);
-  border-color: var(--glass-border-light);
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border);
+  transform: scale(1.05);
 }
 
 .control-btn.active {
   color: var(--accent);
-  border-color: rgba(245, 158, 11, 0.25);
-  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.3);
+  background: var(--accent-bg);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.1);
 }
 
+/* Play Button — Hero Element */
 .play-btn {
   width: 52px;
   height: 52px;
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  color: var(--accent) !important;
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+  border: none;
+  color: var(--text-on-accent) !important;
   border-radius: 50%;
-  margin: 0 6px;
+  margin: 0 4px;
   box-shadow:
-    0 0 24px rgba(245, 158, 11, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    0 4px 20px var(--accent-glow),
+    0 0 40px rgba(245, 158, 11, 0.12);
   transition: all 0.25s ease;
 }
 
 .play-btn:hover {
-  background: rgba(245, 158, 11, 0.18);
-  border-color: rgba(245, 158, 11, 0.45);
+  background: linear-gradient(135deg, var(--accent-hover), var(--accent));
+  transform: scale(1.08);
   box-shadow:
-    0 0 32px rgba(245, 158, 11, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  transform: scale(1.06);
+    0 6px 28px rgba(245, 158, 11, 0.35),
+    0 0 48px rgba(245, 158, 11, 0.15);
+  border-color: transparent;
 }
 
-/* === Volume === */
+.play-btn:active {
+  transform: scale(0.96);
+}
+
+/* === Volume Section === */
 .volume-section {
   display: flex;
   align-items: center;
@@ -525,8 +652,8 @@ body {
   -webkit-appearance: none;
   appearance: none;
   height: 4px;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 2px;
+  background: var(--volume-track);
+  border-radius: var(--radius-pill);
   outline: none;
   cursor: pointer;
 }
@@ -534,18 +661,19 @@ body {
 .volume-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   background: var(--accent);
+  border: 2px solid var(--text-on-accent);
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.15s ease;
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
+  box-shadow: 0 1px 6px var(--accent-glow);
 }
 
 .volume-slider::-webkit-slider-thumb:hover {
   transform: scale(1.25);
-  box-shadow: 0 0 16px rgba(245, 158, 11, 0.5);
+  box-shadow: 0 2px 12px rgba(245, 158, 11, 0.45);
 }
 
 .volume-value {
@@ -553,6 +681,8 @@ body {
   color: var(--text-muted);
   min-width: 30px;
   text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
 }
 
 /* === Playlist Toggle === */
@@ -561,20 +691,23 @@ body {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 11px 14px;
-  background: rgba(255, 255, 255, 0.03);
+  padding: 12px 16px;
+  background: var(--glass-bg-elevated);
   backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: var(--radius-pill);
   color: var(--text-secondary);
   font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
   cursor: pointer;
   transition: all 0.25s ease;
 }
 
 .playlist-toggle:hover {
   background: var(--glass-bg-hover);
-  border-color: var(--glass-border-light);
+  border-color: var(--glass-border);
   color: var(--text-primary);
 }
 
@@ -583,28 +716,27 @@ body {
   color: var(--text-muted);
   margin-left: auto;
   margin-right: 8px;
+  font-weight: 500;
 }
 
 .playlist-toggle svg {
   transition: transform 0.3s ease;
+  flex-shrink: 0;
 }
 
 .playlist-toggle.expanded svg {
   transform: rotate(180deg);
 }
 
-/* === Playlist === */
+/* === Playlist Section === */
 .playlist-section {
   max-height: 300px;
   overflow-y: auto;
   border-radius: var(--radius-md);
-  background: rgba(0, 0, 0, 0.15);
+  background: var(--input-bg);
   backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-}
-
-.playlist-section.hidden {
-  display: none;
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border-subtle);
 }
 
 .playlist-section::-webkit-scrollbar {
@@ -616,8 +748,8 @@ body {
 }
 
 .playlist-section::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 2px;
+  background: var(--scrollbar-thumb);
+  border-radius: var(--radius-pill);
 }
 
 .playlist {
@@ -630,7 +762,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 9px 10px;
+  padding: 10px 12px;
   cursor: pointer;
   transition: all 0.2s ease;
   border-radius: var(--radius-sm);
@@ -638,30 +770,32 @@ body {
 }
 
 .playlist-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: var(--glass-border);
+  background: var(--glass-bg-elevated);
+  border-color: var(--glass-border-subtle);
 }
 
 .playlist-item.active {
-  background: rgba(245, 158, 11, 0.06);
-  border-color: rgba(245, 158, 11, 0.12);
+  background: var(--accent-bg);
+  border-color: rgba(245, 158, 11, 0.15);
 }
 
 .playlist-item-index {
   font-size: 11px;
-  color: #4a4a5a;
+  color: var(--text-muted);
   min-width: 20px;
   text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
 .playlist-item.active .playlist-item-index {
   color: var(--accent);
+  font-weight: 600;
 }
 
 .playlist-item-title {
   flex: 1;
   font-size: 13px;
-  color: #bbb;
+  color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -681,11 +815,11 @@ body {
   display: flex;
 }
 
-/* Playing animation bars */
+/* Playing Animation Bars */
 .playing-bars {
   display: flex;
   align-items: flex-end;
-  gap: 1px;
+  gap: 1.5px;
   height: 14px;
 }
 
@@ -701,17 +835,13 @@ body {
 .playing-bars span:nth-child(2) { height: 10px; animation-delay: 0.15s; }
 .playing-bars span:nth-child(3) { height: 4px; animation-delay: 0.3s; }
 
-@keyframes bar-bounce {
-  0%, 100% { transform: scaleY(0.5); }
-  50% { transform: scaleY(1.2); }
-}
-
-/* === Loading === */
+/* === Loading Overlay === */
 .loading-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(8, 8, 15, 0.85);
-  backdrop-filter: blur(20px);
+  background: var(--overlay-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -720,20 +850,17 @@ body {
   z-index: 10;
   font-size: 13px;
   color: var(--text-secondary);
-}
-
-.loading-overlay.hidden {
-  display: none;
+  font-weight: 500;
 }
 
 .spinner {
   width: 32px;
   height: 32px;
-  border: 2px solid rgba(255, 255, 255, 0.06);
+  border: 2.5px solid var(--spinner-track);
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
-  box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.15);
 }
 
 /* === Favorites Section === */
@@ -741,13 +868,10 @@ body {
   max-height: 200px;
   overflow-y: auto;
   border-radius: var(--radius-md);
-  background: rgba(0, 0, 0, 0.15);
+  background: var(--input-bg);
   backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-}
-
-.favorites-section.hidden {
-  display: none;
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border-subtle);
 }
 
 .favorites-section::-webkit-scrollbar {
@@ -759,8 +883,8 @@ body {
 }
 
 .favorites-section::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 2px;
+  background: var(--scrollbar-thumb);
+  border-radius: var(--radius-pill);
 }
 
 .favorites-list {
@@ -780,7 +904,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 9px 10px;
+  padding: 10px 12px;
   cursor: pointer;
   transition: all 0.2s ease;
   border-radius: var(--radius-sm);
@@ -788,13 +912,13 @@ body {
 }
 
 .favorites-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: var(--glass-border);
+  background: var(--glass-bg-elevated);
+  border-color: var(--glass-border-subtle);
 }
 
 .favorites-item.active {
-  background: rgba(245, 158, 11, 0.06);
-  border-color: rgba(245, 158, 11, 0.12);
+  background: var(--accent-bg);
+  border-color: rgba(245, 158, 11, 0.15);
 }
 
 .favorites-item-info {
@@ -804,7 +928,7 @@ body {
 
 .favorites-item-title {
   font-size: 13px;
-  color: #bbb;
+  color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -844,10 +968,21 @@ body {
 
 .favorites-item-remove:hover {
   color: var(--accent-red);
+  background: rgba(239, 68, 68, 0.08);
 }
 
-/* === Subtle ambient light animation === */
-@keyframes ambient-shift {
-  0%, 100% { opacity: 0.15; }
-  50% { opacity: 0.25; }
+/* === Utility === */
+.hidden {
+  display: none !important;
+}
+
+/* === Animations === */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes bar-bounce {
+  0%, 100% { transform: scaleY(0.5); }
+  50% { transform: scaleY(1.2); }
 }

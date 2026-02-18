@@ -254,7 +254,7 @@ function updateUI(state) {
 
 function renderPlaylist(state) {
   if (!state.playlist || state.playlist.length === 0) {
-    playlistContainer.innerHTML = '<div style="padding:20px;text-align:center;color:#555;font-size:13px;">プレイリストが空です</div>';
+    playlistContainer.innerHTML = '<div class="favorites-empty">プレイリストが空です</div>';
     return;
   }
 
